@@ -986,7 +986,11 @@ ADI_API adi_adrv904x_ErrAction_e adi_adrv904x_DeviceInfoExtract(adi_adrv904x_Dev
     uint32_t                        bandIdx             = 0U;
     uint32_t                        targetIdx           = 0U;
     uint32_t                        digMask             = 0U;
+#ifdef __KERNEL__
+    adi_adrv904x_InitExtract_t      *InitExtractClear = &device->InitExtractClear;
+#else
     adi_adrv904x_InitExtract_t      InitExtractClear;
+#endif
     adrv904x_TxConfig_t             txConfig;
     adrv904x_RxConfig_t             rxConfig;
     adrv904x_OrxConfig_t            orxConfig;
@@ -1010,7 +1014,11 @@ ADI_API adi_adrv904x_ErrAction_e adi_adrv904x_DeviceInfoExtract(adi_adrv904x_Dev
 
     ADI_ADRV904X_NULL_PTR_REPORT_GOTO(&device->common, cpuProfileBinaryInfoPtr->filePath, cleanup);
 
+#ifndef __KERNEL__
     ADI_LIBRARY_MEMSET(&InitExtractClear, 0, sizeof(InitExtractClear));
+#else
+    ADI_LIBRARY_MEMSET(InitExtractClear, 0, sizeof(adi_adrv904x_InitExtract_t));
+#endif
     ADI_LIBRARY_MEMSET(&txConfig, 0, sizeof(txConfig));
     ADI_LIBRARY_MEMSET(&rxConfig, 0, sizeof(rxConfig));
     ADI_LIBRARY_MEMSET(&orxConfig, 0, sizeof(orxConfig));
@@ -1078,7 +1086,11 @@ ADI_API adi_adrv904x_ErrAction_e adi_adrv904x_DeviceInfoExtract(adi_adrv904x_Dev
     }
 
     /* Clear all variables */
+#ifndef __KERNEL__
     device->initExtract = InitExtractClear;
+#else
+    device->initExtract = *InitExtractClear;
+#endif
 
     /* Read scaled device clock frequency */
     offset = ADI_LIBRARY_OFFSETOF(adrv904x_RadioProfile_t, deviceClkScaledFreq_kHz);

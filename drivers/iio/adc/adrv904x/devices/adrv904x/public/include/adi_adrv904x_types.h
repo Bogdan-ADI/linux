@@ -652,6 +652,13 @@ typedef struct adi_adrv904x_Device
     adi_adrv904x_Info_t                 devStateInfo;   /*!< ADRV904X run time state information container */
     adi_adrv904x_SpiConfigSettings_t    spiSettings;    /*!< Pointer to ADRV904X SPI Settings */
     adi_adrv904x_InitExtract_t          initExtract;    /*!< ADRV904X init info extract from CPU Profile container */
+#ifdef __KERNEL__
+    uint8_t                            cmdBuf[1006];    /*!< Command buffer for CPU commands */
+					/* ADRV904X_CPU_CMD_RESP_MAX_SIZE_BYTES placed maybe in adi_adrv904x_cpu_types.h? */
+    adi_adrv904x_Info_t                devStateInfoClear; /*!< ADRV904X run time state information container for initialization */
+    uint8_t                            spiCache[ADI_HAL_SPI_FIFO_SIZE]; /*!< SPI cache buffer */
+    adi_adrv904x_InitExtract_t         InitExtractClear; /*!< ADRV904X init info extract from CPU Profile container for initialization */
+#endif
 } adi_adrv904x_Device_t;
 #endif /* CLIENT_IGNORE */
 
