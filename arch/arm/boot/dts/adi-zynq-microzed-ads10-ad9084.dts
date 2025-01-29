@@ -1,0 +1,244 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Copyright (C) 2011 - 2014 Xilinx
+ * Copyright (C) 2016 Jagan Teki <jteki@openedev.com>
+ * Copyright (C) 2025 Analog Devices
+ */
+/dts-v1/;
+#include "zynq-microzed.dtsi"
+
+/ {
+	model = "Avnet MicroZed board installed in ADS10 for Apollo Project";
+	compatible = "avnet,zynq-microzed", "xlnx,zynq-microzed", "xlnx,zynq-7000";
+
+	/delete-node/ replicator;
+
+	aliases {
+		ethernet0 = &gem0;
+		serial0 = &uart1;
+	};
+
+	chosen {
+		bootargs = "console=ttyPS0,115200 root=/dev/mmcblk0p2 rw earlyprintk rootfstype=ext4 rootwait uio_pdrv_genirq.of_id=generic-uio ip=192.168.0.10";
+		stdout-path = "serial0:115200n8";
+	};
+
+	reserved-memory {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+		reserved: buffer@3C000000 {
+			no-map;
+			reg = <0x3c000000 0x4000000>;
+		};
+	};
+
+	reserved-driver@0 {
+		compatible = "xlnx,reserved-memory";
+		memory-region = <&reserved>;
+	};
+
+	uio_dmaregion_1 {
+		compatible = "generic-uio";
+		status = "okay";
+		reg = <0x3f800000 0x100000>;
+	};
+
+	uio_dmaregion_2 {
+		compatible = "generic-uio";
+		status = "okay";
+		reg = <0x3f900000 0x100000>;
+	};
+
+	uio_dmaregion_3 {
+		compatible = "generic-uio";
+		status = "okay";
+		reg = <0x3fb00000 0x100000>;
+	};
+
+	/delete-node/ fpga-axi@0;
+
+	amba_pl: fpga-axi@0 {
+		compatible = "simple-bus";
+		#address-cells = <0x01>;
+		#size-cells = <0x01>;
+		ranges;
+
+		dma@60000000 {
+			#dma-cells = <0x01>;
+			clock-names = "s_axi_lite_aclk\0m_axi_aclk";
+			clocks = <&clkc 0x0f &clkc 0x0f>;
+			compatible = "xlnx,axi-cdma-1.00.a";
+			interrupt-parent = <&intc>;
+			interrupts = <0x00 0x21 0x04>;
+			reg = <0x60000000 0x10000>;
+			xlnx,addrwidth = <0x20>;
+			xlnx,include-sg;
+			interrupt-names = "cdma_introut";
+
+			dma-channel@60000000 {
+				compatible = "xlnx,axi-cdma-channel";
+				interrupts = <0x00 0x21 0x04>;
+				xlnx,datawidth = <0x20>;
+				xlnx,device-id = <0x00>;
+				xlnx,max-burst-len = <0x10>;
+			};
+		};
+
+		axilite_addr_translation@40000000 {
+			compatible = "xlnx,axilite-addr-translation-1.0";
+			reg = <0x40000000 0x20000000>;
+			status = "okay";
+		};
+
+		uio_fpga_registers@20000000 {
+			compatible = "generic-uio";
+			reg = <0x40000000 0x10000>;
+		};
+
+		uio_fpga_scratch_mem@44A80000 {
+			compatible = "generic-uio";
+			reg = <0x44a80000 0x8000>;
+		};
+
+		uio_spi_controller@44C00000 {
+			compatible = "generic-uio";
+			reg = <0x44c00000 0x30000>;
+		};
+
+		uio_i2c_controller@44A10000 {
+			compatible = "generic-uio";
+			reg = <0x44A10000 0x00010000>;
+		};
+
+		uio_hsci_controller@44D00000 {
+			compatible = "generic-uio";
+			reg = <0x44d00000 0x40000>;
+		};
+
+		uio_data_fifo_mem@30060000 {
+			compatible = "generic-uio";
+			reg = <0x80060000 0x20000>;
+		};
+
+		fmc_spi:uio_fmc_spi0@41000000 {
+			compatible = "generic-uio";
+			reg = <0x41000000 0x1000>;
+		};
+
+		uio_platform_id@60020000 {
+			compatible = "generic-uio";
+			reg = <0x60020000 0x1000>;
+		};
+	};
+};
+
+
+
+&gpio0 {
+	emio-gpio-width = <0x0c>;
+	gpio-mask-high = <0x00>;
+	gpio-mask-low = <0x5600>;
+};
+
+&i2c0 {
+	status = "okay";
+
+	clock-frequency = <0x61a80>;
+
+	i2cswitch@70 {
+		compatible = "nxp,pca9545";
+		reg = <0x70>;
+		#address-cells = <0x01>;
+		#size-cells = <0x00>;
+	
+		i2c@0 {
+			reg = <0x00>;
+		};
+
+		i2c@1 {
+			reg = <0x01>;
+		};
+
+		i2c@2 {
+			reg = <0x02>;
+		};
+
+		i2c@3 {
+			reg = <0x03>;
+		};
+	};
+};
+
+&spi0 {
+	status = "okay";
+
+	is-decoded-cs = <0x00>;
+	num-cs = <0x03>;
+
+	spidev@0 {
+		compatible = "spidev";
+		spi-max-frequency = <0x4c4b40>;
+		reg = <0x00>;
+	};
+};
+
+&qspi {
+	spi-rx-bus-width = <0x04>;
+	spi-tx-bus-width = <0x04>;
+
+	/delete-node/ ps7-qspi@0;
+
+	flash@0 {
+		compatible = "n25q512a\0micron,m25p80";
+		reg = <0x00>;
+		#address-cells = <0x01>;
+		#size-cells = <0x01>;
+		spi-max-frequency = <0x2faf080>;
+
+		partition@0 {
+			label = "boot";
+			reg = <0x00 0x500000>;
+		};
+
+		partition@500000 {
+			label = "bootenv";
+			reg = <0x500000 0x20000>;
+		};
+
+		partition@520000 {
+			label = "kernel";
+			reg = <0x520000 0xae0000>;
+		};
+
+		partition@1000000 {
+			label = "spare";
+			reg = <0x1000000 0x00>;
+		};
+	};
+};
+
+&amba {
+	/delete-node/ sram@fffc0000;
+
+	/delete-node/ etb@f8801000;
+
+	/delete-node/ tpiu@f8803000;
+
+	/delete-node/ funnel@f8804000;
+
+	/delete-node/ ptm@f889c000;
+
+	/delete-node/ ptm@f889c000;
+
+	/delete-node/ ptm@f889c000;
+
+	/delete-node/ ptm@f889d000;
+
+	ocmc0:ocmc@f800c000 {
+		compatible = "xlnx,zynq-ocmc-1.0";
+		interrupt-parent = <&intc>;
+		interrupts = <0x00 0x03 0x04>;
+		reg = <0xf800c000 0x1000>;
+	};
+};
