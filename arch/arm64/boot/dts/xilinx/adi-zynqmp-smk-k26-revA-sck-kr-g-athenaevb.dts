@@ -4,7 +4,7 @@
 	compatible = "xlnx,zynqmp-sk-kr260-revB\0xlnx,zynqmp-sk-kr260\0xlnx,zynqmp";
 	#address-cells = <0x02>;
 	#size-cells = <0x02>;
-	model = "ZynqMP KR260 revB";
+	model = "Xilinx ZynqMP KR260 revB";
 
 	clock5 {
 		phandle = <0x8d>;
